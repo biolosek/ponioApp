@@ -166,6 +166,83 @@ angular.module('ponio.controllers', [])
   }
 })
 
-.controller('RequestsCtrl', function($scope) {
+.controller('RequestsCtrl', function($scope, $http, $ionicPopup) {
+  $scope.getRequestsFunction = function() {
+  $http({
+      method: 'get',
+      url: 'http://supremedev.usermd.net/ponioApp/php/getRequests.php',
+  }).then(function successCallback(data) {
+      if (angular.isArray(data.data)){
+        $scope.requests = data.data;
+        return;
+      }
+      if (data.data == 'Something went wrong'){
+        $scope.requests = [];
+        return;
+      }
+      else {
+        $scope.requests = [];
+        return;
+      }
+    })
+  }
 
+  $scope.getRequestsFunction();
+
+  $scope.accept = function(item){
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/acceptRequest.php',
+      data: {
+      username: item.username,
+      unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+      if(data.data == 'Success'){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Udało się !',
+          template: 'Konto zostało zautentykowane. Użytkownik może się zalogować do systemu!'
+        });
+        $scope.getRequestsFunction();
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił Błąd. Proszę spróbować ponownie!'
+        });
+        $scope.getRequestsFunction();
+        return;
+      }
+      })
+  }
+  $scope.remove = function(item){
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/deleteRequest.php',
+      data: {
+      username: item.username,
+      unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+      if(data.data == 'Success'){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Usunięto !',
+          template: 'Konto zostało odrzucone. Użytkownik nie będzie mógł zalogować się do systemu!'
+        });
+        $scope.getRequestsFunction();
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił Błąd. Proszę spróbować ponownie!'
+        });
+        $scope.getRequestsFunction();
+        return;
+      }
+      })
+  }
 });

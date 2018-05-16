@@ -1,5 +1,22 @@
 <ion-view view-title="Zapytania Autoryzacji">
+  <ion-nav-buttons side="right">
+        <button ng-click="getRequestsFunction();" class="button button-energized">
+          <b>Odśwież</b>
+        </button>
+      </ion-nav-buttons>
   <ion-content>
-    aaaaa
+    <ion-list ng-if="$root.role == 1">
+      <ion-item ng-repeat="item in requests" item="item" can-swipe="listCanSwipe">
+        <b>Login : {{item.username}}</b> - Numer : {{item.unique_id}}
+        <ion-option-button class="button-assertive"
+                       ng-click="remove(item)">
+      Usuń
+    </ion-option-button>
+    <ion-option-button class="button-balanced"
+                       ng-click="accept(item)">
+      Akceptuj
+    </ion-option-button>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>
