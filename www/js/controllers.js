@@ -83,7 +83,7 @@ angular.module('ponio.controllers', [])
 
      // An elaborate, custom popup
      var registerPopup = $ionicPopup.show({
-       template: '<input type="text" placeholder="Nazwa Użytkownika" ng-model="registerData.login"></br><input type="password" placeholder="Hasło" ng-model="registerData.password"></br><input type="password" placeholder="Powtórz Hasło" ng-model="repeatpassword">',
+       template: '<input type="text" placeholder="Nazwa Użytkownika" ng-model="registerData.login"></br><input type="password" placeholder="Hasło" ng-model="registerData.password"></br><input type="password" placeholder="Powtórz Hasło" ng-model="repeatpassword"></br><span ng-show="registerData.password != repeatpassword" class="redSpan"><b>Hasła nie są identyczne!</b></span>',
        title: 'Proszę podać dane do rejestracji',
        scope: $scope,
        buttons: [

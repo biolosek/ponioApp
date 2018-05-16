@@ -14,7 +14,7 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
   $rootScope.role = 0;
   $rootScope.authenticated = false;
 
-  $rootScope.unique_id = window.localStorage['uniqueId'];
+  $rootScope.unique_id = parseInt(window.localStorage['uniqueId']);
 
   if (window.localStorage['authenticated'] == 'true'){
     $rootScope.authenticated = true;
@@ -41,7 +41,6 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
   if ($rootScope.authenticated == false && $rootScope.active == 0) {
     window.location.href = '#/tab/dash';
   }
-
 
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard

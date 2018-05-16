@@ -2,3 +2,6 @@
 input {
   padding: 5px !important;
 }
+.redSpan {
+  color: red !important;
+}
