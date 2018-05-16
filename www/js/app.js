@@ -5,9 +5,44 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope, $window) {
+
+  $rootScope.unique_id = null;
+  $rootScope.active = 0;
+  $rootScope.role = 0;
+  $rootScope.authenticated = false;
+
+  $rootScope.unique_id = window.localStorage['uniqueId'];
+
+  if (window.localStorage['authenticated'] == 'true'){
+    $rootScope.authenticated = true;
+  }
+  if (window.localStorage['authenticated'] == 'false'){
+    $rootScope.authenticated = false;
+  }
+  if (window.localStorage['active'] == '1'){
+    $rootScope.active = 1;
+  }
+  if (window.localStorage['active'] == '0'){
+    $rootScope.active = 0;
+  }
+  if (window.localStorage['role'] == '0'){
+    $rootScope.role = 0;
+  }
+  if (window.localStorage['role'] == '1'){
+    $rootScope.role = 1;
+  }
+
+  if ($rootScope.authenticated == true && $rootScope.active == 1) {
+    window.location.href = '#/tab/chats';
+  }
+  if ($rootScope.authenticated == false && $rootScope.active == 0) {
+    window.location.href = '#/tab/dash';
+  }
+
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -23,7 +58,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $locationProvider) {
+
+  $locationProvider.html5Mode(false);
+  $locationProvider.hashPrefix('');
+
+  $ionicConfigProvider.tabs.position('bottom'); // other values: top
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -34,7 +74,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   // setup an abstract state for the tabs directive
     .state('tab', {
     url: '/tab',
-    abstract: true,
+    abstract: false,
     templateUrl: 'templates/tabs.html'
   })
 
@@ -68,12 +108,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
         }
       }
     })
-
-  .state('tab.account', {
-    url: '/account',
+    .state('tab.request', {
+      url: '/requests',
+      views: {
+        'tab-requests': {
+          templateUrl: 'templates/tab-requests.html',
+          controller: 'RequestsCtrl'
+        }
+      }
+    })
+  .state('tab.setting', {
+    url: '/settings',
     views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
+      'tab-settings': {
+        templateUrl: 'templates/tab-settings.html',
         controller: 'AccountCtrl'
       }
     }
