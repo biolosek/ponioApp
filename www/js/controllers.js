@@ -145,25 +145,87 @@ angular.module('ponio.controllers', [])
         method: 'post',
         url: 'http://supremedev.usermd.net/ponioApp/php/acceptFriend.php',
         data: {
-        user1: item,
-        user2: $rootScope.unique_id,
+        user1: item.user_1,
+        unique_id: $rootScope.unique_id,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+        if(data.data == 'Success'){
+          var alertPopup = $ionicPopup.alert({
+            title: 'Udało się !',
+            template: 'Zaproszenie do znajomych zostało zaakceptowane!'
+          });
+        }
+        else {
+          var alertPopup = $ionicPopup.alert({
+            title: 'Błąd !',
+            template: 'Wystąpił błąd, proszę spróbować ponownie!'
+          });
+        }
+        $scope.getFriendRequestsFunction();
+        $scope.getFriends();
+      })
+  }
+
+  $scope.declineFriend = function(item) {
+    $http({
+        method: 'post',
+        url: 'http://supremedev.usermd.net/ponioApp/php/declineFriend.php',
+        data: {
+        user1: item.user_1,
+        unique_id: $rootScope.unique_id,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+        if(data.data == 'Success'){
+          var alertPopup = $ionicPopup.alert({
+            title: 'Udało się !',
+            template: 'Zaproszenie do znajomych zostało odrzucone!'
+          });
+        }
+        else {
+          var alertPopup = $ionicPopup.alert({
+            title: 'Błąd !',
+            template: 'Wystąpił błąd, proszę spróbować ponownie!'
+          });
+        }
+        $scope.getFriendRequestsFunction();
+        $scope.getFriends();
+      })
+  }
+
+  $scope.getFriends = function() {
+    var friendsList = [];
+    $http({
+        method: 'post',
+        url: 'http://supremedev.usermd.net/ponioApp/php/getFriends.php',
+        data: {
+        unique_id: $rootScope.unique_id,
         },
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).then(function successCallback(data) {
         if (angular.isArray(data.data)){
-          $scope.friendRequests = data.data;
-          return;
+          $scope.friends = data.data;
+          angular.forEach($scope.friends, function(value,key){
+            console.log(value);
+            if(value['user_1'] == $rootScope.unique_id){friendsList.push(value['user_2'], value['username'])};
+            if(value['user_2'] == $rootScope.unique_id){friendsList.push(value['user_1'], value['username'])};
+          });
+          $scope.friendsList = friendsList;
+          console.log($scope.friendsList);
         }
         if (data.data == 'Something went wrong'){
-          $scope.friendRequests = [];
+          $scope.friends = [];
           return;
         }
         else {
-          $scope.friendRequests = [];
+          $scope.friends = [];
           return;
         }
       })
   }
+
+  $scope.getFriends();
 
   $scope.getFriendRequestsFunction = function() {
     $http({
@@ -188,7 +250,7 @@ angular.module('ponio.controllers', [])
         }
       })
   }
-  
+
   setInterval(function(){
     $scope.getFriendRequestsFunction();
   }, 20000)
