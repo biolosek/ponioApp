@@ -208,11 +208,10 @@ angular.module('ponio.controllers', [])
           $scope.friends = data.data;
           angular.forEach($scope.friends, function(value,key){
             console.log(value);
-            if(value['user_1'] == $rootScope.unique_id){friendsList.push(value['user_2'], value['username'])};
-            if(value['user_2'] == $rootScope.unique_id){friendsList.push(value['user_1'], value['username'])};
+            if(value['user_1'] == $rootScope.unique_id){friendsList.push( {unique_id : value['user_2'], name : value['username'], unread : value['unread']} )};
+            if(value['user_2'] == $rootScope.unique_id){friendsList.push( {unique_id : value['user_1'], name : value['username'], unread : value['unread']} )};
           });
           $scope.friendsList = friendsList;
-          console.log($scope.friendsList);
         }
         if (data.data == 'Something went wrong'){
           $scope.friends = [];

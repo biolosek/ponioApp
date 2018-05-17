@@ -37,6 +37,19 @@
         </ion-option-button>
       </ion-item>
     </ion-list>
-    {{friendsList}}
+    <ion-list ng-if="friendsList.length > 0">
+      <ion-item ng-repeat="item in friendsList" item="item" can-swipe="listCanSwipe">
+        <b>{{item.name}}</b> - {{item.unique_id}}
+        <span ng-class="{'badge-assertive' : item.unread == 0, 'badge-balanced' : item.unread > 0}" class="badge">{{item.unread}}</span>
+        <ion-option-button class="button-assertive"
+                       ng-click="removeRequest(item)">
+      Usuń
+    </ion-option-button>
+    <ion-option-button class="button-energized"
+                       ng-click="editFriend(item)">
+      Edytuj
+    </ion-option-button>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>
