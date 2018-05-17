@@ -1,15 +1,30 @@
 <ion-view view-title="Rozmowy">
   <ion-nav-buttons side="right" ng-show="false">
-        <button class="button button-balanced icon-left">
+        <button ng-click="showAddFriendPopup()" class="button button-balanced icon-left">
           <b>Dodaj Kontakt</b>
         </button>
       </ion-nav-buttons>
   <ion-content>
+    <ion-list ng-if="friendRequests.length > 0">
+      <h4 style="padding-left: 10px;">Zaproszenia:</h4>
+      <ion-item ng-repeat="item in friendRequests" item="item" can-swipe="listCanSwipe">
+        <b>Login : {{item.username}}</b> - Numer : {{item.user_1}}
+        <ion-option-button class="button-assertive"
+                       ng-click="removeRequest(item)">
+      Usuń
+    </ion-option-button>
+    <ion-option-button class="button-balanced"
+                       ng-click="acceptFriend(item)">
+      Akceptuj
+    </ion-option-button>
+      </ion-item>
+    </ion-list>
     <div class="card">
       <div style="text-align: center;" class="item item-text-wrap">
         <b>Twój Numer : {{$root.unique_id}}</b>
       </div>
     </div>
+
     <ion-list>
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
         <img ng-src="{{chat.face}}">

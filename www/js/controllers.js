@@ -139,8 +139,105 @@ angular.module('ponio.controllers', [])
     };
 })
 
-.controller('ChatsCtrl', function($scope) {
+.controller('ChatsCtrl', function($scope, $http, $ionicPopup, $rootScope) {
+  $scope.acceptFriend = function(item) {
+    $http({
+        method: 'post',
+        url: 'http://supremedev.usermd.net/ponioApp/php/acceptFriend.php',
+        data: {
+        user1: item,
+        user2: $rootScope.unique_id,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+        if (angular.isArray(data.data)){
+          $scope.friendRequests = data.data;
+          return;
+        }
+        if (data.data == 'Something went wrong'){
+          $scope.friendRequests = [];
+          return;
+        }
+        else {
+          $scope.friendRequests = [];
+          return;
+        }
+      })
+  }
 
+  $scope.getFriendRequestsFunction = function() {
+    $http({
+        method: 'post',
+        url: 'http://supremedev.usermd.net/ponioApp/php/friendRequests.php',
+        data: {
+        unique_id: $rootScope.unique_id,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data) {
+        if (angular.isArray(data.data)){
+          $scope.friendRequests = data.data;
+          return;
+        }
+        if (data.data == 'Something went wrong'){
+          $scope.friendRequests = [];
+          return;
+        }
+        else {
+          $scope.friendRequests = [];
+          return;
+        }
+      })
+  }
+  
+  setInterval(function(){
+    $scope.getFriendRequestsFunction();
+  }, 20000)
+
+  $scope.getFriendRequestsFunction();
+
+  $scope.showAddFriendPopup = function() {
+    $scope.addFriendNumber = null;
+
+    // An elaborate, custom popup
+    var addFriendPopup = $ionicPopup.show({
+      template: '<input type="text" placeholder="Numer Użytkownika" ng-model="$parent.addFriendNumber">',
+      title: 'Proszę podać numer użytkownika',
+      scope: $scope,
+      buttons: [
+        { text: 'Anuluj',
+          type: 'button-assertive', },
+        {
+          text: '<b>Dodaj</b>',
+          type: 'button-balanced',
+          onTap: function(e) {
+            $http({
+              method: 'post',
+              url: 'http://supremedev.usermd.net/ponioApp/php/addFriend.php',
+              data: {
+              user1: $rootScope.unique_id,
+              user2: $scope.addFriendNumber,
+              },
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            })
+          .then(function successCallback(data){
+            if (data.data == 'Success'){
+              var alertPopup = $ionicPopup.alert({
+                title: 'Udało się !',
+                template: 'Twoje zaproszenie do znajomych zostało wysłane!'
+              });
+            }
+            else {
+              var alertPopup = $ionicPopup.alert({
+                title: 'Błąd !',
+                template: 'Wystąpił błąd, proszę spróbować ponownie! Upewnij się że podałeś prawidłowy numer!'
+              });
+            }
+          })
+            }
+          }
+      ]
+    });
+   };
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams) {
