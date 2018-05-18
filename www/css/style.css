@@ -5,3 +5,10 @@ input {
 .redSpan {
   color: red !important;
 }
+.ng-animate .scroll-bar {
+  visibility: visible !important;
+}
+
+.scroll-bar-fade-out{
+  opacity:1 !important
+}

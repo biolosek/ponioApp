@@ -1,14 +1,14 @@
-<!--
-  This template loads for the 'tab.friend-detail' state (app.js)
-  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
-  The FriendsCtrl pulls data from the Friends service (service.js)
-  The Friends service returns an array of friend data
--->
-<ion-view view-title="{{chat.name}}">
+<ion-view>
+  <ion-nav-title>{{thisChatDetails[0].name}} - {{thisChatDetails[0].unique_id}}</ion-nav-title>
   <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-    <p>
-      {{chat.lastText}}
-    </p>
+    <div ng-repeat="item in thisChatMessages" class="row">
+      <p style="background-color : {{item.color}}; border: 1px solid black; border-radius: 5px; padding-top: 5px; padding-left: 5px; padding-right: 5px; word-break: normal; width: 100%;">
+        <span>{{item.message}}</span></br>
+        <span style="float: right; font-size: 10px">{{item.date_sent}}</span><ion-icon ng-if="item.date_read == null" name="close-circle"></ion-icon><ion-icon ng-if="item.date_read != null" name="checkmark-circle"></ion-icon>
+      </p>
+    </div>
   </ion-content>
+  <ion-footer-bar>
+    <textarea ng-model="thisMessage" placeholder="Treść wiadomości..." style="padding: 5px; border-radius: 2px; width: 88%; border: solid 1px black;"></textarea><button ng-click="sendMessage(thisChatDetails[0].unique_id, thisMessage)" ng-disabled="thisMessage == null" style="margin-left: 5px;" class="button icon-right ion-chevron-right button-calm"></button>
+  </ion-footer-bar>
 </ion-view>
