@@ -5,7 +5,27 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
+angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services', 'ngWebSocket'])
+
+    .factory('wsData', function($websocket) {
+        // Open a WebSocket connection
+        var dataStream = $websocket('ws://website.com/data');
+
+        var collection = [];
+
+        dataStream.onMessage(function(message) {
+            collection.push(JSON.parse(message.data));
+        });
+
+        var methods = {
+            collection: collection,
+            get: function() {
+                dataStream.send(JSON.stringify({ action: 'get' }));
+            }
+        };
+
+        return methods;
+    })
 
 .run(function($ionicPlatform, $rootScope, $window) {
 

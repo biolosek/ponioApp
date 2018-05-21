@@ -250,10 +250,6 @@ angular.module('ponio.controllers', [])
 
   $scope.getFriends();
 
-  setInterval(function(){
-      $scope.getFriends();
-  }, 20000);
-
   $scope.getFriendRequestsFunction = function() {
     $http({
         method: 'post',
@@ -277,10 +273,6 @@ angular.module('ponio.controllers', [])
         }
       })
   }
-
-  setInterval(function(){
-    $scope.getFriendRequestsFunction();
-  }, 20000);
 
   $scope.getFriendRequestsFunction();
 
@@ -502,11 +494,7 @@ angular.module('ponio.controllers', [])
   }
   }
   $scope.getChatDetails();
-  setInterval(function(){
-    $scope.getMessages();
-  }, 5000);
   $scope.getMessages();
-  $timeout(function(){$scope.markAsRead(); }, 2000);
 })
 
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
