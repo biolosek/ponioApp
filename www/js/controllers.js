@@ -57,6 +57,13 @@ angular.module('ponio.controllers', [])
                   });
                   return;
                 }
+                if ($scope.myResponse[0].active == 4 ) {
+                  var alertPopup = $ionicPopup.alert({
+                    title: 'Błąd !',
+                    template: 'Twoje konto zostało zbanowane.'
+                  });
+                  return;
+                }
                 if ($scope.myResponse === 'Wrong password') {
                   var alertPopup = $ionicPopup.alert({
                     title: 'Błąd !',
@@ -151,7 +158,6 @@ angular.module('ponio.controllers', [])
       optionsPopup.close();
     }
     $scope.thisFriend = item;
-    console.log($scope.thisFriend);
     var optionsPopup = $ionicPopup.show({
       template: '<a href="#/tab/chats/{{thisFriend.unique_id}}" ng-click="closeOptionsPopup();" class="button button-block button-balanced">Otwórz Czat</a><button ng-click="showEditFriendPopup(thisFriend); closeOptionsPopup();" class="button button-block button-energized">Edytuj Nazwę</button><button ng-click="deleteFriend(thisFriend); closeOptionsPopup();" class="button button-block button-assertive">Usuń z Listy</button>',
       title: 'Opcje Znajomego',
@@ -250,6 +256,10 @@ angular.module('ponio.controllers', [])
 
   $scope.getFriends();
 
+  setInterval(function(){
+    $scope.getFriends();
+  }, 5000);
+
   $scope.getFriendRequestsFunction = function() {
     $http({
         method: 'post',
@@ -275,6 +285,10 @@ angular.module('ponio.controllers', [])
   }
 
   $scope.getFriendRequestsFunction();
+
+  setInterval(function(){
+    $scope.getFriendRequestsFunction();
+  }, 20000);
 
   $scope.showEditFriendPopup = function(item) {
     $scope.friendName = null;
@@ -471,7 +485,6 @@ angular.module('ponio.controllers', [])
           },
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         }).then(function successCallback(data){
-          console.log(data.data);
         })
     }
     })
@@ -488,13 +501,15 @@ angular.module('ponio.controllers', [])
       },
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).then(function successCallback(data){
-      console.log(data.data);
       $scope.thisMessage = null;
     })
   }
   }
   $scope.getChatDetails();
   $scope.getMessages();
+  setInterval(function(){
+    $scope.getMessages();
+  }, 2000);
 })
 
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
@@ -519,7 +534,6 @@ angular.module('ponio.controllers', [])
        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
      }).then(function successCallback(data){
        if (data.data == "Success") {
-         console.log(data.data);
           $scope.logout();
           var alertPopup = $ionicPopup.alert({
              title: 'Udało się !',
@@ -528,7 +542,6 @@ angular.module('ponio.controllers', [])
           return;
        }
        else {
-         console.log(data.data);
          var alertPopup = $ionicPopup.alert({
             title: 'Błąd !',
             template: 'Wystąpił błąd. Proszę spróbować ponownie.'
@@ -537,6 +550,46 @@ angular.module('ponio.controllers', [])
        }
      })
    }
+
+   $scope.clearDatabase = function() {
+     $scope.closeClearDatabasePopup = function(){
+       clearDatabasePopup.close();
+     }
+     var clearDatabasePopup = $ionicPopup.show({
+       template: '<button ng-click="confirmClearDatabase(); closeClearDatabasePopup();" class="button button-block button-balanced">Tak jestem pewien.</button>',
+       title: 'Czy jesteś pewien swojej decyzji ? Wyczyszczenie bazy danych aplikacji jest nieodwracalne !',
+       scope: $scope,
+       buttons: [
+         { text: 'Tylko Żartowałem !',
+           type: 'button-assertive', }
+       ]
+     });
+    };
+    $scope.confirmClearDatabase = function(){
+      $http({
+        method: 'post',
+        url: 'http://supremedev.usermd.net/ponioApp/php/clearDatabase.php',
+        data: {
+          unique_id: $rootScope.unique_id,
+        },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }).then(function successCallback(data){
+        if (data.data == "Success") {
+           var alertPopup = $ionicPopup.alert({
+              title: 'Udało się !',
+              template: 'Baza danych została wyczyszczona, jedyna pozostałość to Twoje konto.'
+            });
+           return;
+        }
+        else {
+          var alertPopup = $ionicPopup.alert({
+             title: 'Błąd !',
+             template: 'Wystąpił błąd. Proszę spróbować ponownie.'
+           });
+           return;
+        }
+      })
+    }
 
    $scope.saveSetting = function(){
      window.localStorage['negative'] = $rootScope.negative;
@@ -623,6 +676,126 @@ angular.module('ponio.controllers', [])
 })
 
 .controller('RequestsCtrl', function($scope, $http, $ionicPopup) {
+  $scope.makeAdmin = function(item) {
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/makeAdmin.php',
+      data: {
+        unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data){
+      if(data.data == "Success"){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Udało się !',
+          template: 'Admin został przyznany do wybranego konta!'
+        });
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
+        });
+        return;
+      }
+    })
+    $scope.getAccountsFunction();
+  };
+  $scope.unbanAccount = function(item) {
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/unbanAccount.php',
+      data: {
+        unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data){
+      if(data.data == "Success"){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Udało się !',
+          template: 'Wybrane konto zostało odblokowane!'
+        });
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
+        });
+        return;
+      }
+    })
+    $scope.getAccountsFunction();
+  };
+  $scope.banAccount = function(item) {
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/banAccount.php',
+      data: {
+        unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data){
+      if(data.data == "Success"){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Udało się !',
+          template: 'Wybrane konto zostało zbanowane!'
+        });
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
+        });
+        return;
+      }
+    })
+    $scope.getAccountsFunction();
+  };
+  $scope.deleteAdmin = function(item) {
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/deleteAdmin.php',
+      data: {
+        unique_id: item.unique_id,
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data){
+      if(data.data == "Success"){
+        var alertPopup = $ionicPopup.alert({
+          title: 'Udało się !',
+          template: 'Admin został odebrany wybranemu kontu!'
+        });
+        return;
+      }
+      else {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Błąd !',
+          template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
+        });
+        return;
+      }
+    })
+    $scope.getAccountsFunction();
+  };
+  $scope.getAccountsFunction = function() {
+    $http({
+      method: 'get',
+      url: 'http://supremedev.usermd.net/ponioApp/php/getAllAccounts.php'
+    }).then(function successCallback(data){
+      if(angular.isArray(data.data)){
+        $scope.allAccounts = data.data;
+        return;
+      }
+      else {
+        $scope.allAccounts = [];
+        return;
+      }
+    })
+  }
+  $scope.getAccountsFunction();
   $scope.getRequestsFunction = function() {
   $http({
       method: 'get',
@@ -641,6 +814,7 @@ angular.module('ponio.controllers', [])
         return;
       }
     })
+    $scope.getAccountsFunction();
   }
 
   $scope.getRequestsFunction();

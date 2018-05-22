@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services', 'ngWebSocket'])
+angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
 
     .factory('wsData', function($websocket) {
         // Open a WebSocket connection
@@ -56,6 +56,9 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services', 'ngWebS
   }
   if (window.localStorage['role'] == '1'){
     $rootScope.role = 1;
+  }
+  if (window.localStorage['role'] == '2'){
+    $rootScope.role = 2;
   }
   if (window.localStorage['negative'] == 'false'){
     $rootScope.negative = false;

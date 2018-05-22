@@ -12,3 +12,18 @@ input {
 .scroll-bar-fade-out{
   opacity:1 !important
 }
+.dark-bg {
+  background-color: black !important;
+}
+.dark-letters {
+  color: black !important;
+}
+.white-letters {
+  color: white !important;
+}
+.white-border-message {
+  border: 1px solid white; border-radius: 5px; padding-top: 5px; padding-left: 5px; padding-right: 5px; word-break: normal; width: 100%;
+}
+.black-border-message {
+  border: 1px solid black; border-radius: 5px; padding-top: 5px; padding-left: 5px; padding-right: 5px; word-break: normal; width: 100%;
+}

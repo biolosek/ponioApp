@@ -11,7 +11,7 @@ navigation history that also transitions its views in and out.
   </ion-tab>
 
   <!-- Requests Tab -->
-  <ion-tab ng-if="$root.authenticated && $root.role == 1" title="Admin" icon-off="ion-ios-eye-outline" icon-on="ion-ios-eye" href="#/tab/requests">
+  <ion-tab ng-if="$root.authenticated && $root.role == 1 || $root.authenticated && $root.role == 2" title="Admin" icon-off="ion-ios-eye-outline" icon-on="ion-ios-eye" href="#/tab/requests">
     <ion-nav-view name="tab-requests"></ion-nav-view>
   </ion-tab>
 

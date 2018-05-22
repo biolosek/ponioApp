@@ -1,11 +1,16 @@
 <ion-view view-title="Administracja">
   <ion-nav-buttons side="right">
-        <button ng-click="getRequestsFunction();" class="button button-energized">
+        <button ng-click="getRequestsFunction(); getAllAccounts();" class="button button-energized">
           <b>Odśwież</b>
         </button>
       </ion-nav-buttons>
-  <ion-content>
-    <ion-list ng-if="$root.role == 1">
+  <ion-content ng-class="{'dark-bg' : $root.negative}">
+    <ion-list ng-if="$root.role == 1 && requests.length > 0 || $root.role == 2 && requests.length > 0">
+      <div class="card">
+        <div style="text-align: center;" class="item item-text-wrap">
+          <b>Zapytania Autoryzacji</b>
+        </div>
+      </div>
       <ion-item ng-repeat="item in requests" item="item" can-swipe="listCanSwipe">
         <b>Login : {{item.username}}</b> - Numer : {{item.unique_id}}
         <ion-option-button class="button-assertive"
@@ -15,6 +20,32 @@
     <ion-option-button class="button-balanced"
                        ng-click="accept(item)">
       Akceptuj
+    </ion-option-button>
+      </ion-item>
+    </ion-list>
+    <ion-list ng-if="$root.role == 2 && allAccounts.length > 0">
+      <div class="card">
+        <div style="text-align: center;" class="item item-text-wrap">
+          <b>Użytkownicy</b>
+        </div>
+      </div>
+      <ion-item ng-repeat="item in allAccounts" item="item" can-swipe="listCanSwipe">
+        <b>{{item.username}}</b> - {{item.unique_id}} <span ng-if="item.role == 1">(Admin)</span> <span ng-if="item.role == 2">(Super Admin)</span> <span ng-if="item.active == 2">(Odrzucone)</span> <span ng-if="item.active == 3">(Zablokowane)</span> <span ng-if="item.active == 4">(Zbanowane)</span>
+        <ion-option-button ng-if="item.active == 1" class="button-assertive"
+                       ng-click="banAccount(item)">
+      Zablokuj
+    </ion-option-button>
+    <ion-option-button ng-if="item.active != 1" class="button-balanced"
+                   ng-click="unbanAccount(item)">
+  Odblokuj
+</ion-option-button>
+    <ion-option-button ng-if="item.role == 0" class="button-royal"
+                       ng-click="makeAdmin(item)">
+      Przyznaj Admina
+    </ion-option-button>
+    <ion-option-button ng-if="item.role == 1" class="button-royal"
+                       ng-click="deleteAdmin(item)">
+      Odbierz Admina
     </ion-option-button>
       </ion-item>
     </ion-list>

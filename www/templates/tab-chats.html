@@ -4,7 +4,7 @@
           <b>Dodaj Kontakt</b>
         </button>
       </ion-nav-buttons>
-  <ion-content>
+  <ion-content ng-class="{'dark-bg' : $root.negative}">
     <ion-list ng-if="friendRequests.length > 0">
       <h4 style="padding-left: 10px;">Zaproszenia:</h4>
       <ion-item ng-repeat="item in friendRequests" item="item" can-swipe="listCanSwipe">

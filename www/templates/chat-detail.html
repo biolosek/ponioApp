@@ -1,14 +1,14 @@
 <ion-view>
   <ion-nav-title>{{thisChatDetails[0].name}} - {{thisChatDetails[0].unique_id}}</ion-nav-title>
-  <ion-content class="padding">
+  <ion-content ng-class="{'dark-bg' : $root.negative}" class="padding">
     <div ng-repeat="item in thisChatMessages" class="row">
-      <p style="background-color : {{item.color}}; border: 1px solid black; border-radius: 5px; padding-top: 5px; padding-left: 5px; padding-right: 5px; word-break: normal; width: 100%;">
+      <p style="background-color : {{item.color}};" ng-class="{'white-border-message' : $root.negative, 'black-border-message' : !$root.negative}">
         <span>{{item.message}}</span></br>
         <span style="float: right; font-size: 10px">{{item.date_sent}}</span><ion-icon ng-if="item.date_read == null" name="close-circle"></ion-icon><ion-icon ng-if="item.date_read != null" name="checkmark-circle"></ion-icon>
       </p>
     </div>
   </ion-content>
-  <ion-footer-bar>
+  <ion-footer-bar ng-class="{'dark-bg' : $root.negative}">
     <textarea ng-model="thisMessage" placeholder="Treść wiadomości..." style="padding: 5px; border-radius: 2px; width: 88%; border: solid 1px black;"></textarea><button ng-click="sendMessage(thisChatDetails[0].unique_id, thisMessage)" ng-disabled="thisMessage == null" style="margin-left: 5px;" class="button icon-right ion-chevron-right button-calm"></button>
   </ion-footer-bar>
 </ion-view>

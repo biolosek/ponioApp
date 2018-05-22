@@ -4,7 +4,7 @@
       <b>Zapisz</b>
     </button>
   </ion-nav-buttons>
-  <ion-content>
+  <ion-content ng-class="{'dark-bg' : $root.negative}">
     <div class="row">
       <div class="col col-100">
         <ul class="list">
@@ -43,8 +43,11 @@
     <button ng-click="changePasswordFunction()" class="button button-block button-royal">
       Zmień Hasło
     </button>
-    <button ng-click="deactivateAccountFunction()" class="button button-block button-dark">
+    <button ng-click="deactivateAccountFunction()" class="button button-block button-energized">
       Deaktywuj Konto
+    </button>
+    <button ng-if="$root.role == 2" style="border: 3px solid red" ng-click="clearDatabase()" class="button button-block button-dark">
+      <b>! WYCZYŚĆ BAZE APLIKACJI !</b>
     </button>
   </div>
   </div>
