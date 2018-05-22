@@ -10,14 +10,14 @@ navigation history that also transitions its views in and out.
     <ion-nav-view name="tab-dash"></ion-nav-view>
   </ion-tab>
 
+  <!-- Requests Tab -->
+  <ion-tab ng-if="$root.authenticated && $root.role == 1" title="Admin" icon-off="ion-ios-eye-outline" icon-on="ion-ios-eye" href="#/tab/requests">
+    <ion-nav-view name="tab-requests"></ion-nav-view>
+  </ion-tab>
+
   <!-- Chats Tab -->
   <ion-tab ng-if="$root.authenticated" title="Rozmowy" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/chats">
     <ion-nav-view name="tab-chats"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Requests Tab -->
-  <ion-tab ng-if="$root.authenticated && $root.role == 1" title="Zapytania" icon-off="ion-ios-checkmark-outline" icon-on="ion-ios-checkmark" href="#/tab/requests">
-    <ion-nav-view name="tab-requests"></ion-nav-view>
   </ion-tab>
 
   <!-- Settings Tab -->

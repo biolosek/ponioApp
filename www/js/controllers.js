@@ -537,7 +537,14 @@ angular.module('ponio.controllers', [])
        }
      })
    }
-  $scope.changePasswordFunction = function() {
+
+   $scope.saveSetting = function(){
+     window.localStorage['negative'] = $rootScope.negative;
+     window.localStorage['count'] = $rootScope.count;
+     window.localStorage['myNumber'] = $rootScope.myNumber;
+   }
+
+    $scope.changePasswordFunction = function() {
     $scope.changePasswordData = {};
 
     var changePasswordPopup = $ionicPopup.show({

@@ -33,6 +33,9 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services', 'ngWebS
   $rootScope.active = 0;
   $rootScope.role = 0;
   $rootScope.authenticated = false;
+  $rootScope.negative = false;
+  $rootScope.count = true;
+  $rootScope.myNumber = true;
 
   $rootScope.unique_id = parseInt(window.localStorage['uniqueId']);
 
@@ -53,6 +56,24 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services', 'ngWebS
   }
   if (window.localStorage['role'] == '1'){
     $rootScope.role = 1;
+  }
+  if (window.localStorage['negative'] == 'false'){
+    $rootScope.negative = false;
+  }
+  if (window.localStorage['negative'] == 'true'){
+    $rootScope.negative = true;
+  }
+  if (window.localStorage['count'] == 'false'){
+    $rootScope.count = false;
+  }
+  if (window.localStorage['count'] == 'true'){
+    $rootScope.count = true;
+  }
+  if (window.localStorage['myNumber'] == 'false'){
+    $rootScope.myNumber = false;
+  }
+  if (window.localStorage['myNumber'] == 'true'){
+    $rootScope.myNumber = true;
   }
 
   if ($rootScope.authenticated == true && $rootScope.active == 1) {

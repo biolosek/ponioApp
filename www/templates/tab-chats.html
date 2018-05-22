@@ -19,7 +19,7 @@
     </ion-option-button>
       </ion-item>
     </ion-list>
-    <div class="card">
+    <div ng-if="$root.myNumber" class="card">
       <div style="text-align: center;" class="item item-text-wrap">
         <b>Twój Numer : {{$root.unique_id}}</b>
       </div>
@@ -27,7 +27,7 @@
     <ion-list ng-if="friendsList.length > 0">
       <ion-item ng-repeat="item in friendsList" href="#/tab/chats/{{item.unique_id}}" item="item" on-hold="friendOptions(item)">
         <b>{{item.name}}</b> - {{item.unique_id}}
-        <span ng-class="{'badge-assertive' : item.unread == 0, 'badge-balanced' : item.unread > 0}" class="badge">{{item.unread}}</span>
+        <span ng-if="$root.count" ng-class="{'badge-assertive' : item.unread == 0, 'badge-balanced' : item.unread > 0}" class="badge">{{item.unread}}</span>
       </ion-item>
     </ion-list>
   </ion-content>

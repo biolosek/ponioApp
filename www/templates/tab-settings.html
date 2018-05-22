@@ -1,5 +1,43 @@
 <ion-view view-title="Ustawienia">
+  <ion-nav-buttons side="right">
+    <button ng-click="saveSetting()" class="button button-calm">
+      <b>Zapisz</b>
+    </button>
+  </ion-nav-buttons>
   <ion-content>
+    <div class="row">
+      <div class="col col-100">
+        <ul class="list">
+          <li class="item item-toggle">
+            Ciemna Wersja Aplikacji
+            <label class="toggle toggle-dark">
+              <input ng-model="$root.negative" type="checkbox">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+          <li class="item item-toggle">
+            Wyświetlaj Ilość Nieodebranych
+            <label class="toggle toggle-balanced">
+              <input ng-model="$root.count" type="checkbox">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+          <li class="item item-toggle">
+            Wyświetlaj Mój Numer
+            <label class="toggle toggle-positive">
+              <input ng-model="$root.myNumber" type="checkbox">
+              <div class="track">
+                <div class="handle"></div>
+              </div>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </div>
     <div class="row">
     <div class="col col-100">
     <button ng-click="changePasswordFunction()" class="button button-block button-royal">
