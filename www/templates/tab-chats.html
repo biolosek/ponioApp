@@ -1,7 +1,9 @@
 <ion-view view-title="Rozmowy">
   <ion-nav-buttons side="right" ng-show="false">
-        <button ng-click="showAddFriendPopup()" class="button button-balanced icon-left">
+        <button ng-click="showAddFriendPopup()" class="button button-balanced">
           <b>Dodaj Kontakt</b>
+        </button>
+        <button ng-click="goTop();" style="margin-left: 5px;" class="button button-dark icon-right ion-arrow-up-a">
         </button>
       </ion-nav-buttons>
   <ion-content ng-class="{'dark-bg' : $root.negative}">
@@ -10,7 +12,7 @@
       <ion-item ng-repeat="item in friendRequests" item="item" can-swipe="listCanSwipe">
         <b>Login : {{item.username}}</b> - Numer : {{item.user_1}}
         <ion-option-button class="button-assertive"
-                       ng-click="removeRequest(item)">
+                       ng-click="declineFriend(item)">
       Usuń
     </ion-option-button>
     <ion-option-button class="button-balanced"

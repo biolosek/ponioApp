@@ -153,12 +153,15 @@ angular.module('ponio.controllers', [])
     };
 })
 
-.controller('ChatsCtrl', function($scope, $http, $ionicPopup, $rootScope) {
+.controller('ChatsCtrl', function($scope, $http, $ionicPopup, $rootScope, $ionicScrollDelegate) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
      if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead" || messageArray[1] == "friendAccepted" || messageArray[1] == "friendDeclined" || messageArray[1] == "deletedFriend" || messageArray[1] == "newFriend"){
        $rootScope.getFriends();
        $scope.getFriendRequestsFunction();
+     }
+     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+       $rootScope.checkAuth();
      }
    }
   $scope.friendOptions = function(item) {
@@ -193,15 +196,17 @@ angular.module('ponio.controllers', [])
             template: 'Zaproszenie do znajomych zostało zaakceptowane!'
           });
           $rootScope.webSocket.send(item.user_1 + "|" + $rootScope.unique_id  + "|" + 'friendAccepted');
+          $scope.getFriendRequestsFunction();
+          $rootScope.getFriends();
         }
         else {
           var alertPopup = $ionicPopup.alert({
             title: 'Błąd !',
             template: 'Wystąpił błąd, proszę spróbować ponownie!'
           });
+          $scope.getFriendRequestsFunction();
+          $rootScope.getFriends();
         }
-        $scope.getFriendRequestsFunction();
-        $rootScope.getFriends();
       })
   }
 
@@ -231,6 +236,10 @@ angular.module('ponio.controllers', [])
         $scope.getFriendRequestsFunction();
         $rootScope.getFriends();
       })
+  }
+
+  $scope.goTop = function(){
+    $ionicScrollDelegate.scrollTop();
   }
 
   $rootScope.getFriends = function() {
@@ -414,6 +423,16 @@ angular.module('ponio.controllers', [])
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate) {
+  $rootScope.webSocket.onmessage = function (event) {
+     var messageArray = event.data.split("|");
+     if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead" || messageArray[1] == "friendAccepted" || messageArray[1] == "friendDeclined" || messageArray[1] == "deletedFriend" || messageArray[1] == "newFriend"){
+       $rootScope.getFriends();
+       $scope.getFriendRequestsFunction();
+     }
+     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+       $rootScope.checkAuth();
+     }
+   }
   $scope.getChatDetails = function() {
     $scope.thisChat = [];
     var thisChatDetails = [];
@@ -556,6 +575,12 @@ angular.module('ponio.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
+  $rootScope.webSocket.onmessage = function (event) {
+     var messageArray = event.data.split("|");
+     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+       $rootScope.checkAuth();
+     }
+   }
   $scope.deactivateAccountFunction = function() {
     var deactivateAccountPopup = $ionicPopup.show({
       template: '<button ng-click="confirmDeactivation();" class="button button-block button-balanced">Tak jestem pewien.</button>',
@@ -703,7 +728,13 @@ angular.module('ponio.controllers', [])
    };
 })
 
-.controller('RequestsCtrl', function($scope, $http, $ionicPopup) {
+.controller('RequestsCtrl', function($scope, $http, $ionicPopup, $rootScope) {
+  $rootScope.webSocket.onmessage = function (event) {
+     var messageArray = event.data.split("|");
+     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+       $rootScope.checkAuth();
+     }
+   }
   $scope.makeAdmin = function(item) {
     $http({
       method: 'post',
@@ -718,6 +749,8 @@ angular.module('ponio.controllers', [])
           title: 'Udało się !',
           template: 'Admin został przyznany do wybranego konta!'
         });
+        $scope.getAccountsFunction();
+        $rootScope.webSocket.send(item.unique_id + "|" + $rootScope.unique_id  + "|" + 'madeAdmin');
         return;
       }
       else {
@@ -725,10 +758,10 @@ angular.module('ponio.controllers', [])
           title: 'Błąd !',
           template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
         });
+        $scope.getAccountsFunction();
         return;
       }
     })
-    $scope.getAccountsFunction();
   };
   $scope.unbanAccount = function(item) {
     $http({
@@ -744,6 +777,7 @@ angular.module('ponio.controllers', [])
           title: 'Udało się !',
           template: 'Wybrane konto zostało odblokowane!'
         });
+        $scope.getAccountsFunction();
         return;
       }
       else {
@@ -751,10 +785,10 @@ angular.module('ponio.controllers', [])
           title: 'Błąd !',
           template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
         });
+        $scope.getAccountsFunction();
         return;
       }
     })
-    $scope.getAccountsFunction();
   };
   $scope.banAccount = function(item) {
     $http({
@@ -770,6 +804,8 @@ angular.module('ponio.controllers', [])
           title: 'Udało się !',
           template: 'Wybrane konto zostało zbanowane!'
         });
+        $scope.getAccountsFunction();
+        $rootScope.webSocket.send(item.unique_id + "|" + $rootScope.unique_id  + "|" + 'bannedAccount');
         return;
       }
       else {
@@ -777,10 +813,10 @@ angular.module('ponio.controllers', [])
           title: 'Błąd !',
           template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
         });
+        $scope.getAccountsFunction();
         return;
       }
     })
-    $scope.getAccountsFunction();
   };
   $scope.deleteAdmin = function(item) {
     $http({
@@ -796,6 +832,8 @@ angular.module('ponio.controllers', [])
           title: 'Udało się !',
           template: 'Admin został odebrany wybranemu kontu!'
         });
+        $scope.getAccountsFunction();
+        $rootScope.webSocket.send(item.unique_id + "|" + $rootScope.unique_id  + "|" + 'adminDeleted');
         return;
       }
       else {
@@ -803,10 +841,10 @@ angular.module('ponio.controllers', [])
           title: 'Błąd !',
           template: 'Wystąpił nieoczekiwany błąd, spróbuj później!'
         });
+        $scope.getAccountsFunction();
         return;
       }
     })
-    $scope.getAccountsFunction();
   };
   $scope.getAccountsFunction = function() {
     $http({
