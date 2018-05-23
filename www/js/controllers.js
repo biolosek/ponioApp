@@ -356,7 +356,7 @@ angular.module('ponio.controllers', [])
           template: 'Znajomy został usunięty z listy!'
         });
         $rootScope.getFriends();
-        $rootScope.webSocket.send($scope.thisFriendDelete.id + "|" + $rootScope.unique_id  + "|" + 'deletedFriend');
+        $rootScope.webSocket.send($scope.thisFriendDelete.unique_id + "|" + $rootScope.unique_id  + "|" + 'deletedFriend');
       }
         else {
           var alertPopup = $ionicPopup.alert({
@@ -499,6 +499,7 @@ angular.module('ponio.controllers', [])
            });
            $scope.thisChatMessages = thisChatMessages;
            $ionicScrollDelegate.scrollBottom();
+           $rootScope.getFriends();
            return;
          }
          if (data.data == 'Something went wrong'){

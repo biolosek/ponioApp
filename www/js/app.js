@@ -9,6 +9,10 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
 
 .run(function($ionicPlatform, $rootScope, $window, $http) {
 
+  $rootScope.negative = false;
+  $rootScope.count = true;
+  $rootScope.myNumber = true;
+
   $rootScope.checkAuth = function(){
     $http({
       method: 'post',
@@ -23,6 +27,9 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
         $rootScope.active = data.data[0]['active'];
         $rootScope.role = data.data[0]['role'];
         $rootScope.authenticated = true;
+        $rootScope.negative = false;
+        $rootScope.count = true;
+        $rootScope.myNumber = true;
         if (window.localStorage['negative'] == 'false'){
           $rootScope.negative = false;
         }
@@ -49,6 +56,9 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
         $rootScope.active = 0;
         $rootScope.role = 0;
         $rootScope.authenticated = false;
+        $rootScope.negative = false;
+        $rootScope.count = true;
+        $rootScope.myNumber = true;
         if (window.localStorage['negative'] == 'false'){
           $rootScope.negative = false;
         }
