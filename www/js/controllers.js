@@ -37,6 +37,7 @@ angular.module('ponio.controllers', [])
                   window.localStorage['active'] = $rootScope.active;
                   window.localStorage['role'] = $rootScope.role;
                   window.location.href = '#/tab/chats';
+                  $rootScope.connectWebSocket();
                   var alertPopup = $ionicPopup.alert({
                     title: 'Udało się !',
                     template: 'Zostałeś zalogowany do systemu.'
@@ -153,6 +154,13 @@ angular.module('ponio.controllers', [])
 })
 
 .controller('ChatsCtrl', function($scope, $http, $ionicPopup, $rootScope) {
+  $rootScope.webSocket.onmessage = function (event) {
+     var messageArray = event.data.split("|");
+     if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead" || messageArray[1] == "friendAccepted" || messageArray[1] == "friendDeclined" || messageArray[1] == "deletedFriend" || messageArray[1] == "newFriend"){
+       $rootScope.getFriends();
+       $scope.getFriendRequestsFunction();
+     }
+   }
   $scope.friendOptions = function(item) {
     $scope.closeOptionsPopup = function(){
       optionsPopup.close();
@@ -184,6 +192,7 @@ angular.module('ponio.controllers', [])
             title: 'Udało się !',
             template: 'Zaproszenie do znajomych zostało zaakceptowane!'
           });
+          $rootScope.webSocket.send(item.user_1 + "|" + $rootScope.unique_id  + "|" + 'friendAccepted');
         }
         else {
           var alertPopup = $ionicPopup.alert({
@@ -192,7 +201,7 @@ angular.module('ponio.controllers', [])
           });
         }
         $scope.getFriendRequestsFunction();
-        $scope.getFriends();
+        $rootScope.getFriends();
       })
   }
 
@@ -211,6 +220,7 @@ angular.module('ponio.controllers', [])
             title: 'Udało się !',
             template: 'Zaproszenie do znajomych zostało odrzucone!'
           });
+          $rootScope.webSocket.send(item.user_1 + "|" + $rootScope.unique_id  + "|" + 'friendDeclined');
         }
         else {
           var alertPopup = $ionicPopup.alert({
@@ -219,11 +229,11 @@ angular.module('ponio.controllers', [])
           });
         }
         $scope.getFriendRequestsFunction();
-        $scope.getFriends();
+        $rootScope.getFriends();
       })
   }
 
-  $scope.getFriends = function() {
+  $rootScope.getFriends = function() {
     $scope.friendsList = [];
     var friendsList = [];
     $http({
@@ -254,11 +264,7 @@ angular.module('ponio.controllers', [])
       })
   }
 
-  $scope.getFriends();
-
-  setInterval(function(){
-    $scope.getFriends();
-  }, 5000);
+  $rootScope.getFriends();
 
   $scope.getFriendRequestsFunction = function() {
     $http({
@@ -285,10 +291,6 @@ angular.module('ponio.controllers', [])
   }
 
   $scope.getFriendRequestsFunction();
-
-  setInterval(function(){
-    $scope.getFriendRequestsFunction();
-  }, 20000);
 
   $scope.showEditFriendPopup = function(item) {
     $scope.friendName = null;
@@ -320,7 +322,7 @@ angular.module('ponio.controllers', [])
                 template: 'Nazwa znajomego została zmieniona!'
               });
               $scope.closeOptionsPopup();
-              $scope.getFriends();
+              $rootScope.getFriends();
             }
             else {
               var alertPopup = $ionicPopup.alert({
@@ -328,7 +330,7 @@ angular.module('ponio.controllers', [])
                 template: 'Wystąpił błąd, proszę spróbować ponownie!'
               });
               $scope.closeOptionsPopup();
-              $scope.getFriends();
+              $rootScope.getFriends();
             }
           })
             }
@@ -353,14 +355,15 @@ angular.module('ponio.controllers', [])
           title: 'Udało się !',
           template: 'Znajomy został usunięty z listy!'
         });
-        $scope.getFriends();
+        $rootScope.getFriends();
+        $rootScope.webSocket.send($scope.thisFriendDelete.id + "|" + $rootScope.unique_id  + "|" + 'deletedFriend');
       }
         else {
           var alertPopup = $ionicPopup.alert({
             title: 'Błąd !',
             template: 'Wystąpił błąd, proszę spróbować ponownie!'
           });
-          $scope.getFriends();
+          $rootScope.getFriends();
         }
       })
     }
@@ -394,6 +397,7 @@ angular.module('ponio.controllers', [])
                 title: 'Udało się !',
                 template: 'Twoje zaproszenie do znajomych zostało wysłane!'
               });
+              $rootScope.webSocket.send($scope.addFriendNumber + "|" + $rootScope.unique_id  + "|" + 'newFriend');
             }
             else {
               var alertPopup = $ionicPopup.alert({
@@ -409,7 +413,7 @@ angular.module('ponio.controllers', [])
    };
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout) {
+.controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate) {
   $scope.getChatDetails = function() {
     $scope.thisChat = [];
     var thisChatDetails = [];
@@ -425,8 +429,8 @@ angular.module('ponio.controllers', [])
       if (angular.isArray(data.data)){
         $scope.thisChat = data.data;
         angular.forEach($scope.thisChat, function(value,key){
-          if(value['user_1'] == $rootScope.unique_id){thisChatDetails.push( {id : value['account_contact_id'], unique_id : value['user_2'], name : value['username'], unread : value['unread']} )};
-          if(value['user_2'] == $rootScope.unique_id){thisChatDetails.push( {id : value['account_contact_id'], unique_id : value['user_1'], name : value['username'], unread : value['unread']} )};
+          if(value['user_1'] == $rootScope.unique_id){thisChatDetails.push( {id : value['account_contact_id'], unique_id : value['user_2'], name : value['username']} )};
+          if(value['user_2'] == $rootScope.unique_id){thisChatDetails.push( {id : value['account_contact_id'], unique_id : value['user_1'], name : value['username']} )};
         });
         $scope.thisChatDetails = thisChatDetails;
         return;
@@ -460,7 +464,7 @@ angular.module('ponio.controllers', [])
           if(value['for_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color: "#11c1f3"} )};
         });
         $scope.thisChatMessages = thisChatMessages;
-        $scope.markAsRead();
+        $ionicScrollDelegate.scrollBottom();
         return;
       }
       if (data.data == 'Something went wrong'){
@@ -473,6 +477,41 @@ angular.module('ponio.controllers', [])
       }
     })
   };
+  $rootScope.webSocket.onmessage = function (event) {
+     var messageArray = event.data.split("|");
+     if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead"){
+       $scope.thisMessages = [];
+       var thisChatMessages = [];
+       $http({
+         method: 'post',
+         url: 'http://supremedev.usermd.net/ponioApp/php/getMessages.php',
+         data: {
+         user_1: $rootScope.unique_id,
+         user_2: messageArray[0],
+         },
+         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+       }).then(function successCallback(data){
+         if (angular.isArray(data.data)){
+           $scope.thisMessages = data.data;
+           angular.forEach($scope.thisMessages, function(value,key){
+             if(value['from_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color : "#f8f8f8"} )};
+             if(value['for_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color: "#11c1f3"} )};
+           });
+           $scope.thisChatMessages = thisChatMessages;
+           $ionicScrollDelegate.scrollBottom();
+           return;
+         }
+         if (data.data == 'Something went wrong'){
+           $scope.thisMessages = [];
+           return;
+         }
+         else {
+           $scope.thisMessages = [];
+           return;
+         }
+       })
+     }
+  }
   $scope.markAsRead = function(){
     angular.forEach($scope.thisChatMessages, function(value, key){
       if (value['date_read'] == null && value['for_account_id'] == $rootScope.unique_id){
@@ -485,6 +524,9 @@ angular.module('ponio.controllers', [])
           },
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         }).then(function successCallback(data){
+          $rootScope.webSocket.send($stateParams.chatId + "|" + $rootScope.unique_id  + "|" + 'markedRead');
+          $scope.getMessages();
+          $rootScope.getFriends();
         })
     }
     })
@@ -502,14 +544,14 @@ angular.module('ponio.controllers', [])
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).then(function successCallback(data){
       $scope.thisMessage = null;
+      $scope.getMessages();
+      $rootScope.webSocket.send($stateParams.chatId + "|" + $rootScope.unique_id  + "|" + 'newMessage');
+      $scope.markAsRead();
     })
   }
   }
   $scope.getChatDetails();
   $scope.getMessages();
-  setInterval(function(){
-    $scope.getMessages();
-  }, 2000);
 })
 
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
@@ -534,7 +576,7 @@ angular.module('ponio.controllers', [])
        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
      }).then(function successCallback(data){
        if (data.data == "Success") {
-          $scope.logout();
+          $rootScope.logout();
           var alertPopup = $ionicPopup.alert({
              title: 'Udało się !',
              template: 'Twoje konto zostało zablokowane.'
@@ -571,6 +613,7 @@ angular.module('ponio.controllers', [])
         url: 'http://supremedev.usermd.net/ponioApp/php/clearDatabase.php',
         data: {
           unique_id: $rootScope.unique_id,
+          role: $rootScope.role,
         },
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
       }).then(function successCallback(data){
@@ -627,7 +670,7 @@ angular.module('ponio.controllers', [])
                  title: 'Udało się !',
                  template: 'Twoje hasło zostało zmienione. Zaloguj się przy pomocy nowego hasła !'
                });
-               $scope.logout();
+               $rootScope.logout();
                return;
             }
             if (data.data == "Incorrect password") {
@@ -657,22 +700,6 @@ angular.module('ponio.controllers', [])
       ]
     });
    };
-  $scope.logout = function() {
-    window.location.href = '#/tab/dash';
-    window.localStorage.removeItem('uniqueId');
-    window.localStorage.removeItem('active');
-    window.localStorage.removeItem('authenticated');
-    window.localStorage.removeItem('role');
-    $rootScope.unique_id = null;
-    $rootScope.active = 0;
-    $rootScope.authenticated = false;
-    $rootScope.role = 0;
-    window.localStorage['authenticated'] = false;
-    window.localStorage['uniqueId'] = $rootScope.unique_id;
-    window.localStorage['active'] = $rootScope.active;
-    window.localStorage['role'] = $rootScope.role;
-    window.location.reload();
-  }
 })
 
 .controller('RequestsCtrl', function($scope, $http, $ionicPopup) {

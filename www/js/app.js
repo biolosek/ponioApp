@@ -7,91 +7,121 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
 
-    .factory('wsData', function($websocket) {
-        // Open a WebSocket connection
-        var dataStream = $websocket('ws://website.com/data');
+.run(function($ionicPlatform, $rootScope, $window, $http) {
 
-        var collection = [];
-
-        dataStream.onMessage(function(message) {
-            collection.push(JSON.parse(message.data));
-        });
-
-        var methods = {
-            collection: collection,
-            get: function() {
-                dataStream.send(JSON.stringify({ action: 'get' }));
-            }
-        };
-
-        return methods;
+  $rootScope.checkAuth = function(){
+    $http({
+      method: 'post',
+      url: 'http://supremedev.usermd.net/ponioApp/php/checkAuth.php',
+      data: {
+        unique_id: parseInt(window.localStorage['uniqueId']),
+      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(function successCallback(data){
+      if(angular.isArray(data.data) && data.data.length == 1 && data.data[0]['active'] == 1){
+        $rootScope.unique_id = data.data[0]['unique_id'];
+        $rootScope.active = data.data[0]['active'];
+        $rootScope.role = data.data[0]['role'];
+        $rootScope.authenticated = true;
+        if (window.localStorage['negative'] == 'false'){
+          $rootScope.negative = false;
+        }
+        if (window.localStorage['negative'] == 'true'){
+          $rootScope.negative = true;
+        }
+        if (window.localStorage['count'] == 'false'){
+          $rootScope.count = false;
+        }
+        if (window.localStorage['count'] == 'true'){
+          $rootScope.count = true;
+        }
+        if (window.localStorage['myNumber'] == 'false'){
+          $rootScope.myNumber = false;
+        }
+        if (window.localStorage['myNumber'] == 'true'){
+          $rootScope.myNumber = true;
+        }
+        window.location.href = '#/tab/chats';
+        $rootScope.connectWebSocket();
+        return;
+      } else {
+        $rootScope.unique_id = null;
+        $rootScope.active = 0;
+        $rootScope.role = 0;
+        $rootScope.authenticated = false;
+        if (window.localStorage['negative'] == 'false'){
+          $rootScope.negative = false;
+        }
+        if (window.localStorage['negative'] == 'true'){
+          $rootScope.negative = true;
+        }
+        if (window.localStorage['count'] == 'false'){
+          $rootScope.count = false;
+        }
+        if (window.localStorage['count'] == 'true'){
+          $rootScope.count = true;
+        }
+        if (window.localStorage['myNumber'] == 'false'){
+          $rootScope.myNumber = false;
+        }
+        if (window.localStorage['myNumber'] == 'true'){
+          $rootScope.myNumber = true;
+        }
+        window.location.href = '#/tab/dash';
+      }
     })
-
-.run(function($ionicPlatform, $rootScope, $window) {
-
-  $rootScope.unique_id = null;
-  $rootScope.active = 0;
-  $rootScope.role = 0;
-  $rootScope.authenticated = false;
-  $rootScope.negative = false;
-  $rootScope.count = true;
-  $rootScope.myNumber = true;
-
-  $rootScope.unique_id = parseInt(window.localStorage['uniqueId']);
-
-  if (window.localStorage['authenticated'] == 'true'){
-    $rootScope.authenticated = true;
-  }
-  if (window.localStorage['authenticated'] == 'false'){
-    $rootScope.authenticated = false;
-  }
-  if (window.localStorage['active'] == '1'){
-    $rootScope.active = 1;
-  }
-  if (window.localStorage['active'] == '0'){
-    $rootScope.active = 0;
-  }
-  if (window.localStorage['role'] == '0'){
-    $rootScope.role = 0;
-  }
-  if (window.localStorage['role'] == '1'){
-    $rootScope.role = 1;
-  }
-  if (window.localStorage['role'] == '2'){
-    $rootScope.role = 2;
-  }
-  if (window.localStorage['negative'] == 'false'){
-    $rootScope.negative = false;
-  }
-  if (window.localStorage['negative'] == 'true'){
-    $rootScope.negative = true;
-  }
-  if (window.localStorage['count'] == 'false'){
-    $rootScope.count = false;
-  }
-  if (window.localStorage['count'] == 'true'){
-    $rootScope.count = true;
-  }
-  if (window.localStorage['myNumber'] == 'false'){
-    $rootScope.myNumber = false;
-  }
-  if (window.localStorage['myNumber'] == 'true'){
-    $rootScope.myNumber = true;
   }
 
-  if ($rootScope.authenticated == true && $rootScope.active == 1) {
-    window.location.href = '#/tab/chats';
-  }
-  if ($rootScope.authenticated == false && $rootScope.active == 0) {
-    window.location.href = '#/tab/dash';
-  }
+  $rootScope.connectWebSocket = function () {
+       $rootScope.webSocket = new WebSocket("ws://ws.supremedev.usermd.net:9007?" + window.localStorage['uniqueId']);
+
+       $rootScope.webSocket.onopen = function (event) {
+           console.log('Nawiązano połączenie z WebSocketem.');
+       }
+
+       $rootScope.webSocket.onerror = function (event) {
+           console.log('Błąd połączenia z WebSocketem : ', event);
+       }
+
+       $rootScope.webSocket.onclose = function (event) {
+           console.log('Zamknięto połączenie z WebSocketem.');
+       }
+
+       $rootScope.webSocket.onmessage = function (event) {
+          var messageArray = event.data.split("|");
+          console.log(messageArray);
+       }
+
+   }
+
+   $rootScope.logout = function() {
+     window.location.href = '#/tab/dash';
+     window.localStorage.removeItem('uniqueId');
+     window.localStorage.removeItem('active');
+     window.localStorage.removeItem('authenticated');
+     window.localStorage.removeItem('role');
+     $rootScope.unique_id = null;
+     $rootScope.active = 0;
+     $rootScope.authenticated = false;
+     $rootScope.role = 0;
+     window.localStorage['authenticated'] = false;
+     window.localStorage['uniqueId'] = $rootScope.unique_id;
+     window.localStorage['active'] = $rootScope.active;
+     window.localStorage['role'] = $rootScope.role;
+     if($rootScope.webSocket != undefined){
+       $rootScope.webSocket.close();
+     }
+     window.location.reload();
+   }
+
+  $rootScope.checkAuth();
 
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
+      cordova.plugins.Keyboard.disableScroll(false);
 
     }
     if (window.StatusBar) {
