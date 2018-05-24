@@ -1,5 +1,9 @@
 <ion-view view-title="Rozmowy">
-  <ion-nav-buttons side="right" ng-show="false">
+  <ion-nav-buttons side="left">
+        <button ng-click="$root.refresh();" style="color: black;" class="button button-energized icon-right ion-ios-refresh-outline">
+        </button>
+      </ion-nav-buttons>
+  <ion-nav-buttons side="right">
         <button ng-click="showAddFriendPopup()" class="button button-balanced">
           <b>Dodaj Kontakt</b>
         </button>
@@ -9,16 +13,9 @@
   <ion-content ng-class="{'dark-bg' : $root.negative}">
     <ion-list ng-if="friendRequests.length > 0">
       <h4 style="padding-left: 10px;">Zaproszenia:</h4>
-      <ion-item ng-repeat="item in friendRequests" item="item" can-swipe="listCanSwipe">
+      <ion-item ng-repeat="item in friendRequests" item="item" class="item-icon-right" can-swipe="listCanSwipe">
         <b>Login : {{item.username}}</b> - Numer : {{item.user_1}}
-        <ion-option-button class="button-assertive"
-                       ng-click="declineFriend(item)">
-      Usuń
-    </ion-option-button>
-    <ion-option-button class="button-balanced"
-                       ng-click="acceptFriend(item)">
-      Akceptuj
-    </ion-option-button>
+        <ion-icon ng-click="acceptFriend(item)" style="color: #33cd5f; margin-right: 30px" name="add-circle"></ion-icon><ion-icon ng-click="declineFriend(item)" style="color: #ef473a;" name="close-circle"></ion-icon>
       </ion-item>
     </ion-list>
     <div ng-if="$root.myNumber" class="card">

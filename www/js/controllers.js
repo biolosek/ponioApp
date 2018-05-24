@@ -156,11 +156,12 @@ angular.module('ponio.controllers', [])
 .controller('ChatsCtrl', function($scope, $http, $ionicPopup, $rootScope, $ionicScrollDelegate) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
+     console.log(messageArray);
      if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead" || messageArray[1] == "friendAccepted" || messageArray[1] == "friendDeclined" || messageArray[1] == "deletedFriend" || messageArray[1] == "newFriend"){
        $rootScope.getFriends();
        $scope.getFriendRequestsFunction();
      }
-     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+     if (messageArray[1] == "bannedAccount"){
        $rootScope.checkAuth();
      }
    }
@@ -425,11 +426,12 @@ angular.module('ponio.controllers', [])
 .controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
+     console.log(messageArray);
      if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead" || messageArray[1] == "friendAccepted" || messageArray[1] == "friendDeclined" || messageArray[1] == "deletedFriend" || messageArray[1] == "newFriend"){
        $rootScope.getFriends();
        $scope.getFriendRequestsFunction();
      }
-     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+     if (messageArray[1] == "bannedAccount"){
        $rootScope.checkAuth();
      }
    }
@@ -498,6 +500,7 @@ angular.module('ponio.controllers', [])
   };
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
+     console.log(messageArray);
      if (messageArray[1] == "newMessage" || messageArray[1] == "markedRead"){
        $scope.thisMessages = [];
        var thisChatMessages = [];
@@ -577,7 +580,8 @@ angular.module('ponio.controllers', [])
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
-     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+     console.log(messageArray);
+     if (messageArray[1] == "bannedAccount"){
        $rootScope.checkAuth();
      }
    }
@@ -731,7 +735,8 @@ angular.module('ponio.controllers', [])
 .controller('RequestsCtrl', function($scope, $http, $ionicPopup, $rootScope) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
-     if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin" || messageArray[1] == "adminDeleted"){
+     console.log(messageArray);
+     if (messageArray[1] == "bannedAccount"){
        $rootScope.checkAuth();
      }
    }
@@ -750,7 +755,6 @@ angular.module('ponio.controllers', [])
           template: 'Admin został przyznany do wybranego konta!'
         });
         $scope.getAccountsFunction();
-        $rootScope.webSocket.send(item.unique_id + "|" + $rootScope.unique_id  + "|" + 'madeAdmin');
         return;
       }
       else {
@@ -833,7 +837,6 @@ angular.module('ponio.controllers', [])
           template: 'Admin został odebrany wybranemu kontu!'
         });
         $scope.getAccountsFunction();
-        $rootScope.webSocket.send(item.unique_id + "|" + $rootScope.unique_id  + "|" + 'adminDeleted');
         return;
       }
       else {

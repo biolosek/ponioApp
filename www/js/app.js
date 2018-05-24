@@ -100,11 +100,12 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
        $rootScope.webSocket.onmessage = function (event) {
           var messageArray = event.data.split("|");
           console.log(messageArray);
-          if (messageArray[1] == "bannedAccount" || messageArray[1] == "madeAdmin"){
-            $rootScope.checkAuth();
-          }
        }
 
+   }
+
+   $rootScope.refresh = function(){
+     window.location.reload();
    }
 
    $rootScope.logout = function() {
