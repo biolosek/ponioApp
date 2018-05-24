@@ -422,8 +422,14 @@ angular.module('ponio.controllers', [])
     });
    };
 })
-
-.controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate) {
+.filter('to_trusted', ['$sce', function($sce){
+    return function(text) {
+         var doc = new DOMParser().parseFromString(text, "text/html");
+         var rval = doc.documentElement.textContent;
+        return $sce.trustAsHtml(rval)
+    };
+}])
+.controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate, $sce) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
      console.log(messageArray);
@@ -481,8 +487,14 @@ angular.module('ponio.controllers', [])
       if (angular.isArray(data.data)){
         $scope.thisMessages = data.data;
         angular.forEach($scope.thisMessages, function(value,key){
-          if(value['from_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color : "#f8f8f8"} )};
-          if(value['for_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color: "#11c1f3"} )};
+          thisChatMessages.push( {
+            id : value['message_id'],
+            from_message_id : value['from_message_id'],
+            for_account_id : value['for_account_id'],
+            date_sent : value['date_sent'],
+            date_read : value['date_read'],
+            message : $sce.trustAsHtml(value['message']),
+            color : value['from_account_id'] == $rootScope.unique_id ? "#f8f8f8" : "#11c1f3"} );
         });
         $scope.thisChatMessages = thisChatMessages;
         $ionicScrollDelegate.scrollBottom();
@@ -576,7 +588,6 @@ angular.module('ponio.controllers', [])
   $scope.getChatDetails();
   $scope.getMessages();
 })
-
 .controller('AccountCtrl', function($scope, $rootScope, $window, $ionicPopup, $http) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");

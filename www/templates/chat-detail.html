@@ -8,7 +8,7 @@
   <ion-content ng-class="{'dark-bg' : $root.negative}" class="padding">
     <div ng-repeat="item in thisChatMessages" class="row">
       <p style="background-color : {{item.color}};" ng-class="{'white-border-message' : $root.negative, 'black-border-message' : !$root.negative}">
-        <span>{{item.message}}</span></br>
+        <span ng-bind-html="item.message | to_trusted"></span></br>
         <span style="float: right; font-size: 10px">{{item.date_sent}}</span><ion-icon ng-if="item.date_read == null" name="close-circle"></ion-icon><ion-icon ng-if="item.date_read != null" name="checkmark-circle"></ion-icon>
       </p>
     </div>
