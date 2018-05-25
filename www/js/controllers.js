@@ -97,7 +97,7 @@ angular.module('ponio.controllers', [])
      $scope.registerData = {};
 
      var registerPopup = $ionicPopup.show({
-       template: '<input type="text" placeholder="Nazwa Użytkownika" ng-model="registerData.login"></br><input type="password" placeholder="Hasło" ng-model="registerData.password"></br><input type="password" placeholder="Powtórz Hasło" ng-model="repeatpassword"></br><span ng-show="registerData.password != repeatpassword" class="redSpan"><b>Hasła nie są identyczne!</b></span>',
+       template: '<input type="text" placeholder="Nazwa Użytkownika" ng-model="registerData.login"></br><input type="password" placeholder="Hasło" ng-model="registerData.password"></br><input type="password" placeholder="Powtórz Hasło" ng-model="registerData.repeatpassword"></br><span ng-show="registerData.password != registerData.repeatpassword" class="redSpan"><b>Hasła nie są identyczne!</b></span>',
        title: 'Proszę podać dane do rejestracji',
        scope: $scope,
        buttons: [
@@ -107,6 +107,7 @@ angular.module('ponio.controllers', [])
            text: '<b>Zarejestruj</b>',
            type: 'button-balanced',
            onTap: function(e) {
+             if($scope.registerData.password == $scope.registerData.repeatpassword){
              $http({
                method: 'post',
                url: 'http://supremedev.usermd.net/ponioApp/php/registration.php',
@@ -146,6 +147,22 @@ angular.module('ponio.controllers', [])
                return;
              }
            })
+           return;
+         }
+          if($scope.registerData.password != $scope.registerData.repeatpassword){
+            var alertPopup = $ionicPopup.alert({
+              title: 'Błąd !',
+              template: 'Podane przez Ciebie hasło oraz jego powtórzenie nie zgadzają się ze sobą, upewnij się aby podać dwukrotnie to samo hasło!'
+            });
+            return;
+          }
+          else {
+            var alertPopup = $ionicPopup.alert({
+              title: 'Błąd !',
+              template: 'Coś poszło nie tak, proszę sprobować ponownie!'
+            });
+            return;
+          }
            }
          }
        ]
@@ -162,7 +179,7 @@ angular.module('ponio.controllers', [])
        $scope.getFriendRequestsFunction();
      }
      if (messageArray[1] == "bannedAccount"){
-       $rootScope.checkAuth();
+       $rootScope.logout();
      }
    }
   $scope.friendOptions = function(item) {
@@ -431,7 +448,7 @@ angular.module('ponio.controllers', [])
        $scope.getFriendRequestsFunction();
      }
      if (messageArray[1] == "bannedAccount"){
-       $rootScope.checkAuth();
+       $rootScope.logout();
      }
    }
   $scope.getChatDetails = function() {
@@ -485,9 +502,9 @@ angular.module('ponio.controllers', [])
             from_message_id : value['from_message_id'],
             for_account_id : value['for_account_id'],
             date_sent : value['date_sent'],
-            date_read : value['date_read'] == "" ? null : value['date_read'],
+            date_read : value['date_read'] == '' ? null : value['date_read'],
             message : $sce.trustAsHtml(value['message']),
-            color : value['from_account_id'] == $rootScope.unique_id ? "#f8f8f8" : "#11c1f3"} );
+            color : value['from_account_id'] == $rootScope.unique_id ? "#f8f8f8" : $rootScope.messageColor} );
         });
         $scope.thisChatMessages = thisChatMessages;
         $ionicScrollDelegate.scrollBottom();
@@ -521,8 +538,14 @@ angular.module('ponio.controllers', [])
          if (angular.isArray(data.data)){
            $scope.thisMessages = data.data;
            angular.forEach($scope.thisMessages, function(value,key){
-             if(value['from_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color : "#f8f8f8"} )};
-             if(value['for_account_id'] == $rootScope.unique_id){thisChatMessages.push( {id : value['message_id'], from_message_id : value['from_message_id'], for_account_id : value['for_account_id'], date_sent : value['date_sent'], date_read : value['date_read'], message : value['message'], color: "#11c1f3"} )};
+             thisChatMessages.push( {
+               id : value['message_id'],
+               from_message_id : value['from_message_id'],
+               for_account_id : value['for_account_id'],
+               date_sent : value['date_sent'],
+               date_read : value['date_read'] == '' ? null : value['date_read'],
+               message : $sce.trustAsHtml(value['message']),
+               color : value['from_account_id'] == $rootScope.unique_id ? "#f8f8f8" : $rootScope.messageColor} );
            });
            $scope.thisChatMessages = thisChatMessages;
            $ionicScrollDelegate.scrollBottom();
@@ -586,7 +609,7 @@ angular.module('ponio.controllers', [])
      var messageArray = event.data.split("|");
      console.log(messageArray);
      if (messageArray[1] == "bannedAccount"){
-       $rootScope.checkAuth();
+       $rootScope.logout();
      }
    }
   $scope.deactivateAccountFunction = function() {
@@ -595,7 +618,7 @@ angular.module('ponio.controllers', [])
       title: 'Czy jesteś pewien swojej decyzji ?',
       scope: $scope,
       buttons: [
-        { text: 'Tylko Żartowałem !',
+        { text: 'Tylko żartowałem !',
           type: 'button-assertive', }
       ]
     });
@@ -636,7 +659,7 @@ angular.module('ponio.controllers', [])
        title: 'Czy jesteś pewien swojej decyzji ? Wyczyszczenie bazy danych aplikacji jest nieodwracalne !',
        scope: $scope,
        buttons: [
-         { text: 'Tylko Żartowałem !',
+         { text: 'Tylko żartowałem !',
            type: 'button-assertive', }
        ]
      });
@@ -652,10 +675,11 @@ angular.module('ponio.controllers', [])
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
       }).then(function successCallback(data){
         if (data.data == "Success") {
-           var alertPopup = $ionicPopup.alert({
-              title: 'Udało się !',
-              template: 'Baza danych została wyczyszczona, jedyna pozostałość to Twoje konto.'
-            });
+            window.location.reload();
+            var alertPopup = $ionicPopup.alert({
+               title: 'Udało się !',
+               template: 'Baza danych została wyczyszczona, jedyna pozostałość to Twoje konto.'
+             });
            return;
         }
         else {
@@ -672,13 +696,15 @@ angular.module('ponio.controllers', [])
      window.localStorage['negative'] = $rootScope.negative;
      window.localStorage['count'] = $rootScope.count;
      window.localStorage['myNumber'] = $rootScope.myNumber;
+     window.localStorage['messageColor'] = $rootScope.messageColor;
+     window.location.reload();
    }
 
     $scope.changePasswordFunction = function() {
     $scope.changePasswordData = {};
 
     var changePasswordPopup = $ionicPopup.show({
-      template: '<input type="password" placeholder="Stare Hasło" ng-model="changePasswordData.passwordold"></br><input type="password" placeholder="Nowe Hasło" ng-model="changePasswordData.passwordnew"></br><input type="password" placeholder="Powtórz Nowe Hasło" ng-model="repeatpassword"></br><span ng-show="changePasswordData.passwordnew != repeatpassword" class="redSpan"><b>Hasła nie są identyczne!</b></span>',
+      template: '<input type="password" placeholder="Stare Hasło" ng-model="changePasswordData.passwordold"></br><input type="password" placeholder="Nowe Hasło" ng-model="changePasswordData.passwordnew"></br><input type="password" placeholder="Powtórz Nowe Hasło" ng-model="changePasswordData.repeatpassword"></br><span ng-show="changePasswordData.passwordnew != changePasswordData.repeatpassword" class="redSpan"><b>Hasła nie są identyczne!</b></span>',
       title: 'Proszę podać dane do zmiany hasła',
       scope: $scope,
       buttons: [
@@ -688,6 +714,7 @@ angular.module('ponio.controllers', [])
           text: '<b>Potwierdź</b>',
           type: 'button-balanced',
           onTap: function(e) {
+            if ($scope.changePasswordData.passwordnew == $scope.changePasswordData.repeatpassword){
             $http({
               method: 'post',
               url: 'http://supremedev.usermd.net/ponioApp/php/changePassword.php',
@@ -729,7 +756,23 @@ angular.module('ponio.controllers', [])
               return;
             }
           })
+          return;
           }
+          if ($scope.changePasswordData.passwordnew != $scope.changePasswordData.repeatpassword){
+            var alertPopup = $ionicPopup.alert({
+              title: 'Błąd !',
+              template: 'Podane przez Ciebie hasło oraz jego powtórzenie nie zgadzają się ze sobą, upewnij się aby podać dwukrotnie to samo hasło!'
+            });
+            return;
+          }
+          else {
+            var alertPopup = $ionicPopup.alert({
+              title: 'Błąd !',
+              template: 'Coś poszło nie tak, proszę spróbować ponownie !'
+            });
+            return;
+          }
+        }
         }
       ]
     });
@@ -741,7 +784,7 @@ angular.module('ponio.controllers', [])
      var messageArray = event.data.split("|");
      console.log(messageArray);
      if (messageArray[1] == "bannedAccount"){
-       $rootScope.checkAuth();
+       $rootScope.logout();
      }
    }
   $scope.makeAdmin = function(item) {

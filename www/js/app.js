@@ -12,6 +12,7 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
   $rootScope.negative = false;
   $rootScope.count = true;
   $rootScope.myNumber = true;
+  $rootScope.messageColor = "#11c1f3";
 
   $rootScope.checkAuth = function(){
     $http({
@@ -30,6 +31,12 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
         $rootScope.negative = false;
         $rootScope.count = true;
         $rootScope.myNumber = true;
+        if($rootScope.messageColor != undefined){
+          $rootScope.messageColor = window.localStorage['messageColor'];
+        }
+        if($rootScope.messageColor == undefined){
+          $rootScope.messageColor = "#11c1f3";
+        }
         if (window.localStorage['negative'] == 'false'){
           $rootScope.negative = false;
         }
@@ -59,6 +66,12 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
         $rootScope.negative = false;
         $rootScope.count = true;
         $rootScope.myNumber = true;
+        if($rootScope.messageColor != undefined){
+          $rootScope.messageColor = window.localStorage['messageColor'];
+        }
+        if($rootScope.messageColor == undefined){
+          $rootScope.messageColor = "#11c1f3";
+        }
         if (window.localStorage['negative'] == 'false'){
           $rootScope.negative = false;
         }
@@ -114,14 +127,17 @@ angular.module('ponio', ['ionic', 'ponio.controllers', 'ponio.services'])
      window.localStorage.removeItem('active');
      window.localStorage.removeItem('authenticated');
      window.localStorage.removeItem('role');
+     window.localStorage.removeItem('messageColor');
      $rootScope.unique_id = null;
      $rootScope.active = 0;
      $rootScope.authenticated = false;
      $rootScope.role = 0;
+     $rootScope.messageColor = "#11c1f3";
      window.localStorage['authenticated'] = false;
      window.localStorage['uniqueId'] = $rootScope.unique_id;
      window.localStorage['active'] = $rootScope.active;
      window.localStorage['role'] = $rootScope.role;
+     window.localStorage['messageColor'] = $rootScope.messageColor;
      if($rootScope.webSocket != undefined){
        $rootScope.webSocket.close();
      }

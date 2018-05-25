@@ -28,7 +28,7 @@
       </div>
       <ion-item ng-repeat="item in allAccounts" item="item" can-swipe="listCanSwipe">
         <b>{{item.username}}</b> - {{item.unique_id}} <span ng-if="item.role == 1">(Admin)</span> <span ng-if="item.role == 2">(Super Admin)</span> <span ng-if="item.active == 2">(Odrzucone)</span> <span ng-if="item.active == 3">(Zablokowane)</span> <span ng-if="item.active == 4">(Zbanowane)</span>
-        <ion-option-button ng-if="item.active == 1" class="button-assertive"
+        <ion-option-button ng-if="item.active == 1 && item.role != 2" class="button-assertive"
                        ng-click="banAccount(item)">
       Zablokuj
     </ion-option-button>

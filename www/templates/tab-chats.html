@@ -14,7 +14,7 @@
     <ion-list ng-if="friendRequests.length > 0">
       <h4 style="padding-left: 10px;">Zaproszenia:</h4>
       <ion-item ng-repeat="item in friendRequests" item="item" class="item-icon-right" can-swipe="listCanSwipe">
-        <b>Login : {{item.username}}</b> - Numer : {{item.user_1}}
+        <b>Numer : {{item.user_1}}</b>
         <ion-icon ng-click="acceptFriend(item)" style="color: #33cd5f; margin-right: 30px" name="add-circle"></ion-icon><ion-icon ng-click="declineFriend(item)" style="color: #ef473a;" name="close-circle"></ion-icon>
       </ion-item>
     </ion-list>
