@@ -422,13 +422,6 @@ angular.module('ponio.controllers', [])
     });
    };
 })
-.filter('to_trusted', ['$sce', function($sce){
-    return function(text) {
-         var doc = new DOMParser().parseFromString(text, "text/html");
-         var rval = doc.documentElement.textContent;
-        return $sce.trustAsHtml(rval)
-    };
-}])
 .controller('ChatDetailCtrl', function($scope, $stateParams, $http, $rootScope, $timeout, $ionicScrollDelegate, $sce) {
   $rootScope.webSocket.onmessage = function (event) {
      var messageArray = event.data.split("|");
@@ -492,7 +485,7 @@ angular.module('ponio.controllers', [])
             from_message_id : value['from_message_id'],
             for_account_id : value['for_account_id'],
             date_sent : value['date_sent'],
-            date_read : value['date_read'],
+            date_read : value['date_read'] == "" ? null : value['date_read'],
             message : $sce.trustAsHtml(value['message']),
             color : value['from_account_id'] == $rootScope.unique_id ? "#f8f8f8" : "#11c1f3"} );
         });
